@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovShield | 机密治理协议演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --accent: #a855f7;
+            --bg: #020617;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: #f1f5f9;
+        }
+
+        .mono { font-family: 'JetBrains+Mono', monospace; }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+        }
+
+        .glow-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glow-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .mxe-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="fas fa-shield-halved text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">GovShield</h1>
+                    <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Confidential Governance v1.0</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-8">
+                <div class="hidden md:flex gap-6 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    <a href="#" class="hover:text-indigo-400 transition">治理概览</a>
+                    <a href="#" class="hover:text-indigo-400 transition">技术架构</a>
+                    <a href="#" class="hover:text-indigo-400 transition">开发者 API</a>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800 hidden md:block"></div>
+                <button class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20">
+                    连接钱包
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl mx-auto px-6 py-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Proposal Main Section -->
+        <div class="lg:col-span-8 space-y-8">
+            
+            <div class="glass-card rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/10 blur-[80px] rounded-full"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex flex-wrap items-center gap-3 mb-6">
+                        <span class="bg-indigo-500/10 text-indigo-400 text-[10px] font-black px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase tracking-wider">提案 PIP-0824</span>
+                        <span class="text-slate-500 text-xs font-semibold flex items-center gap-1.5">
+                            <i class="far fa-clock"></i> 计票截止: 18h 42m
+                        </span>
+                        <span class="ml-auto text-xs text-green-500 font-bold flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500 mxe-pulse"></span>
+                            网络就绪: Arcium Devnet
+                        </span>
+                    </div>
+
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6 leading-tight text-white">
+                        优化国库分红模型：引入基于 FHE 的隐私分配权重算法
+                    </h2>
+                    
+                    <p class="text-slate-400 text-base leading-relaxed mb-10 max-w-3xl">
+                        本提案旨在将现有的治理权重分配迁移至 Arcium 机密网络。通过全同态加密 (FHE) 技术，投票者的具体权重和选择将在密文状态下进行求和，确保在结果最终公布前，任何人都无法观测到投票趋势，从而彻底杜绝“跟风投票”和潜在的治理贿赂。
+                    </p>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                        <div class="bg-slate-950/60 p-6 rounded-2xl border border-slate-800/50">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-2 tracking-widest">机密选票</p>
+                            <p class="text-3xl font-black text-white mono" id="totalVotes">1,402</p>
+                        </div>
+                        <div class="bg-slate-950/60 p-6 rounded-2xl border border-slate-800/50">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-2 tracking-widest">已计入权重</p>
+                            <p class="text-3xl font-black text-indigo-400 mono">42.8M</p>
+                        </div>
+                        <div class="bg-slate-950/60 p-6 rounded-2xl border border-slate-800/50">
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-2 tracking-widest">投票状态</p>
+                            <p class="text-lg font-bold text-white uppercase mt-1">公开计票已锁定</p>
+                        </div>
+                    </div>
+
+                    <!-- Voting Action -->
+                    <div id="voteInterface" class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="castVote('Yes')" class="flex-1 bg-white text-slate-950 font-black py-5 rounded-2xl glow-button flex items-center justify-center gap-3 text-lg">
+                            <i class="fas fa-check-circle text-xl"></i> 赞成 (Yes)
+                        </button>
+                        <button onclick="castVote('No')" class="flex-1 bg-slate-900 border border-slate-700 text-white font-black py-5 rounded-2xl hover:bg-slate-800 transition flex items-center justify-center gap-3 text-lg active:scale-95">
+                            <i class="fas fa-times-circle text-xl"></i> 反对 (No)
+                        </button>
+                    </div>
+
+                    <!-- Processing State -->
+                    <div id="processingState" class="hidden py-8 text-center space-y-6">
+                        <div class="flex justify-center gap-3">
+                            <div class="w-3 h-3 bg-indigo-500 rounded-full animate-bounce"></div>
+                            <div class="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                            <div class="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm font-bold text-indigo-400 uppercase tracking-widest" id="mxeStatus">正在启动同态加密引擎...</p>
+                            <p class="text-[10px] text-slate-500 mono">正在与 MXE 集群进行零知识握手</p>
+                        </div>
+                    </div>
+
+                    <!-- Success State -->
+                    <div id="successState" class="hidden bg-emerald-500/5 border border-emerald-500/20 p-8 rounded-2xl flex items-center gap-6 fade-in">
+                        <div class="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-shield-check text-emerald-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-emerald-100 text-lg">选票已通过机密通道提交</p>
+                            <p class="text-xs text-emerald-500/60 font-mono mt-1">Tx: 8ZVcFcKkzj3NA...LGhcVKaLGhQ</p>
+                        </div>
+                        <button onclick="location.reload()" class="ml-auto text-xs font-bold text-slate-400 hover:text-white transition uppercase">返回</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Protocol Highlights -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-2xl space-y-3">
+                    <i class="fas fa-user-secret text-indigo-400"></i>
+                    <h4 class="font-bold text-sm">完全匿名</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">您的身份与投票选择在计算阶段完全分离，任何人无法追踪。</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl space-y-3">
+                    <i class="fas fa-calculator text-purple-400"></i>
+                    <h4 class="font-bold text-sm">链上计票</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">所有累加计算均在 Arcium 的 FHE 电路中完成，结果由数学逻辑背书。</p>
+                </div>
+                <div class="glass-card p-6 rounded-2xl space-y-3">
+                    <i class="fas fa-bolt text-amber-400"></i>
+                    <h4 class="font-bold text-sm">抗抢跑攻击</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">由于中间状态对验证者不可见，彻底解决了治理过程中的 MEV 问题。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Logs Sidebar -->
+        <div class="lg:col-span-4 space-y-6">
+            <div class="glass-card rounded-[2rem] p-6 h-full flex flex-col min-h-[560px]">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+                        <i class="fas fa-terminal text-[8px]"></i> MXE 节点实时日志
+                    </h3>
+                    <div class="text-[10px] font-mono text-indigo-400 px-2 py-0.5 bg-indigo-500/10 rounded border border-indigo-500/20">
+                        LIVE
+                    </div>
+                </div>
+                
+                <div id="logContainer" class="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar mono text-[10px] leading-relaxed">
+                    <!-- Logs will be injected here -->
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-slate-800 space-y-4 bg-gradient-to-t from-slate-950/40 to-transparent">
+                    <div class="flex justify-between text-[10px]">
+                        <span class="text-slate-500 font-bold uppercase tracking-widest">验证群组</span>
+                        <span class="text-white">Arcium Cluster 456</span>
+                    </div>
+                    <div class="flex justify-between text-[10px]">
+                        <span class="text-slate-500 font-bold uppercase tracking-widest">当前偏移量</span>
+                        <span class="text-indigo-400 mono">0x1C4A...9E2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Protocol Badge -->
+            <div class="bg-indigo-600/10 border border-indigo-500/20 rounded-2xl p-5 flex items-center gap-4">
+                <i class="fas fa-cube text-indigo-500 text-xl"></i>
+                <div class="text-[10px] text-indigo-200/60 leading-normal">
+                    GovShield 基于 <b>Arcium</b> FHE 架构开发，致力于为去中心化组织提供下一代隐私治理方案。
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-auto py-10 border-t border-slate-800/40 text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.4em]">
+        GovShield Confidential Protocol &copy; 2026
+    </footer>
+
+    <script>
+        const logContainer = document.getElementById('logContainer');
+        const mxeStatus = document.getElementById('mxeStatus');
+        const voteInterface = document.getElementById('voteInterface');
+        const processingState = document.getElementById('processingState');
+        const successState = document.getElementById('successState');
+        const totalVotesEl = document.getElementById('totalVotes');
+
+        const systemLogs = [
+            "正在检测机密内存池状态...",
+            "节点 A1 完成 ZK 验证...",
+            "节点 B2 同步电路快照...",
+            "正在注入系统熵源...",
+            "电路指令 'tally_votes' 处于空闲状态",
+            "正在监测 Solana Devnet 状态...",
+            "Epoch 456 周期内同步完成"
+        ];
+
+        function addLog(text, color = 'text-slate-500') {
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const log = document.createElement('div');
+            log.className = `${color} fade-in`;
+            log.innerHTML = `<span class="text-slate-700 mr-2">${time}</span> ${text}`;
+            logContainer.prepend(log);
+            if (logContainer.childNodes.length > 25) logContainer.lastChild.remove();
+        }
+
+        function castVote(choice) {
+            voteInterface.classList.add('hidden');
+            processingState.classList.remove('hidden');
+            
+            const steps = [
+                "生成 X25519 临时密钥对...",
+                "正在执行 Arcis 密文提升...",
+                "正在向 MXE 提交计算请求...",
+                "计算已完成，正在同步结果..."
+            ];
+
+            let step = 0;
+            const interval = setInterval(() => {
+                mxeStatus.innerText = steps[step];
+                addLog(`[ACTION] 接收到 ${choice === 'Yes' ? '赞成' : '反对'} 票权重请求`, 'text-indigo-400');
+                step++;
+                if (step >= steps.length) {
+                    clearInterval(interval);
+                    setTimeout(showSuccess, 500);
+                }
+            }, 1000);
+        }
+
+        function showSuccess() {
+            processingState.classList.add('hidden');
+            successState.classList.remove('hidden');
+            totalVotesEl.innerText = "1,403";
+            addLog("🎉 提案 PIP-0824 同态计票同步成功", "text-emerald-500 font-bold");
+        }
+
+        // Background pulses
+        setInterval(() => {
+            const randLog = systemLogs[Math.floor(Math.random() * systemLogs.length)];
+            addLog(`[MXE] ${randLog}`);
+        }, 4000);
+
+        // Initial logs
+        addLog("[SYS] GovShield 节点连接就绪");
+        addLog("[SYS] 正在加载电路 tally_votes v1.0");
+    </script>
+</body>
+</html>
