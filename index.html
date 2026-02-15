@@ -108,11 +108,11 @@
                     </div>
 
                     <h2 class="text-3xl md:text-4xl font-bold mb-6 leading-tight text-white">
-                        优化国库分红模型：引入基于 FHE 的隐私分配权重算法
+                        优化国库分红模型：引入基于 MPC 的隐私分配权重算法
                     </h2>
                     
                     <p class="text-slate-400 text-base leading-relaxed mb-10 max-w-3xl">
-                        本提案旨在将现有的治理权重分配迁移至 Arcium 机密网络。通过全同态加密 (FHE) 技术，投票者的具体权重和选择将在密文状态下进行求和，确保在结果最终公布前，任何人都无法观测到投票趋势，从而彻底杜绝“跟风投票”和潜在的治理贿赂。
+                        本提案旨在将现有的治理权重分配迁移至 Arcium 机密网络。通过多方安全计算 (MPC) 技术，投票者的具体权重和选择将在密文状态下进行求和，确保在结果最终公布前，任何人都无法观测到投票趋势，从而彻底杜绝“跟风投票”和潜在的治理贿赂。
                     </p>
 
                     <!-- Stats Grid -->
@@ -149,8 +149,8 @@
                             <div class="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
                         </div>
                         <div class="space-y-2">
-                            <p class="text-sm font-bold text-indigo-400 uppercase tracking-widest" id="mxeStatus">正在启动同态加密引擎...</p>
-                            <p class="text-[10px] text-slate-500 mono">正在与 MXE 集群进行零知识握手</p>
+                            <p class="text-sm font-bold text-indigo-400 uppercase tracking-widest" id="mxeStatus">正在启动 MPC 计算引擎...</p>
+                            <p class="text-[10px] text-slate-500 mono">正在与 MXE 集群进行秘密共享握手</p>
                         </div>
                     </div>
 
@@ -178,7 +178,7 @@
                 <div class="glass-card p-6 rounded-2xl space-y-3">
                     <i class="fas fa-calculator text-purple-400"></i>
                     <h4 class="font-bold text-sm">链上计票</h4>
-                    <p class="text-xs text-slate-500 leading-relaxed">所有累加计算均在 Arcium 的 FHE 电路中完成，结果由数学逻辑背书。</p>
+                    <p class="text-xs text-slate-500 leading-relaxed">所有累加计算均在 Arcium 的 MPC 电路中完成，结果由数学逻辑背书。</p>
                 </div>
                 <div class="glass-card p-6 rounded-2xl space-y-3">
                     <i class="fas fa-bolt text-amber-400"></i>
@@ -220,7 +220,7 @@
             <div class="bg-indigo-600/10 border border-indigo-500/20 rounded-2xl p-5 flex items-center gap-4">
                 <i class="fas fa-cube text-indigo-500 text-xl"></i>
                 <div class="text-[10px] text-indigo-200/60 leading-normal">
-                    GovShield 基于 <b>Arcium</b> FHE 架构开发，致力于为去中心化组织提供下一代隐私治理方案。
+                    GovShield 基于 <b>Arcium</b> MPC 架构开发，致力于为去中心化组织提供下一代隐私治理方案。
                 </div>
             </div>
         </div>
@@ -263,7 +263,7 @@
             
             const steps = [
                 "生成 X25519 临时密钥对...",
-                "正在执行 Arcis 密文提升...",
+                "正在执行 MPC 秘密共享...",
                 "正在向 MXE 提交计算请求...",
                 "计算已完成，正在同步结果..."
             ];
@@ -284,7 +284,7 @@
             processingState.classList.add('hidden');
             successState.classList.remove('hidden');
             totalVotesEl.innerText = "1,403";
-            addLog("🎉 提案 PIP-0824 同态计票同步成功", "text-emerald-500 font-bold");
+            addLog("🎉 提案 PIP-0824 隐私计票同步成功", "text-emerald-500 font-bold");
         }
 
         // Background pulses
