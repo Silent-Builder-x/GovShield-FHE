@@ -4,45 +4,56 @@ use arcis::*;
 mod private_governance {
     use arcis::*;
 
-    pub struct VotingBallot {
-        /// The vote value: 1 for Yes, 0 for No (encrypted)
-        pub choice: u32,
-        /// Optional: Weight of the voter (e.g., governance token balance)
-        pub weight: u32,
+    pub struct CurrentTally {
+        // 当前链上累积的加密票数
+        // 0: Yes Votes, 1: No Votes, 2: Abstain
+        pub counts: [u64; 3], 
     }
 
-    /// Fixed-size batch for FHE circuit compatibility
-    pub struct VotingBatch {
-        pub ballots: [VotingBallot; 2],
+    pub struct UserVote {
+        // 用户的选择 (1=Yes, 2=No, 3=Abstain)
+        pub choice: u64,
+        // 用户的权重 (Token Balance)
+        pub weight: u64,
     }
 
-    pub struct TallyResult {
-        /// The aggregated total of all "Yes" votes weighted by their power
-        pub total_yes_votes: u32,
-        /// Proof of execution timestamp or nonce
-        pub batch_id: u64,
+    pub struct UpdateResult {
+        // 更新后的加密票数
+        pub new_counts: [u64; 3],
     }
 
-    /// Tally Votes: Homomorphically sum the batch of encrypted ballots
     #[instruction]
-    pub fn tally_votes(
-        input_ctxt: Enc<Shared, VotingBatch>,
-        batch_id: u64
-    ) -> Enc<Shared, TallyResult> {
-        let input = input_ctxt.to_arcis();
+    pub fn cast_vote(
+        tally_ctxt: Enc<Shared, CurrentTally>,
+        vote_ctxt: Enc<Shared, UserVote>
+    ) -> Enc<Shared, UpdateResult> {
+        let tally = tally_ctxt.to_arcis();
+        let vote = vote_ctxt.to_arcis();
         
-        // Initialize tally with the first ballot's weighted vote
-        let mut total_yes = input.ballots[0].choice * input.ballots[0].weight;
+        // 使用 Mux (Multiplexer) 将权重分配到对应的桶中
+        // If choice == 1 (Yes), add weight to counts[0]
+        // If choice == 2 (No), add weight to counts[1]
+        // If choice == 3 (Abstain), add weight to counts[2]
 
-        // Add the second ballot (In FHE, we must use fixed iterations)
-        total_yes = total_yes + (input.ballots[1].choice * input.ballots[1].weight);
+        let is_yes = vote.choice == 1;
+        let is_no = vote.choice == 2;
+        let is_abstain = vote.choice == 3;
 
-        let result = TallyResult {
-            total_yes_votes: total_yes,
-            batch_id,
+        // 计算增量
+        let add_yes = if is_yes { vote.weight } else { 0u64 };
+        let add_no = if is_no { vote.weight } else { 0u64 };
+        let add_abs = if is_abstain { vote.weight } else { 0u64 };
+
+        // 同态累加
+        let new_yes = tally.counts[0] + add_yes;
+        let new_no = tally.counts[1] + add_no;
+        let new_abs = tally.counts[2] + add_abs;
+
+        let result = UpdateResult {
+            new_counts: [new_yes, new_no, new_abs],
         };
 
-        // Return the encrypted tally to the protocol authority
-        input_ctxt.owner.from_arcis(result)
+        // 返回更新后的加密状态给链上程序
+        tally_ctxt.owner.from_arcis(result)
     }
 }
