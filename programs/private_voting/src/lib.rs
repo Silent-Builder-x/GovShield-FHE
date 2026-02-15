@@ -14,25 +14,25 @@ pub mod private_voting {
         Ok(())
     }
 
-    /// [新增] 创建加密投票箱
+    /// [New] Create an encrypted ballot box
     pub fn create_poll(ctx: Context<CreatePoll>, proposal_id: u64) -> Result<()> {
         let poll = &mut ctx.accounts.poll;
         poll.authority = ctx.accounts.authority.key();
         poll.proposal_id = proposal_id;
-        // 初始化加密计数器为 0 (3个 u64: Yes, No, Abstain)
-        // 假设前端已通过工具生成了代表 [0,0,0] 的初始密文
+        // Initialize the encrypted counter to 0 (3 u64: Yes, No, Abstain)
+        // Assume the frontend has generated ciphertext representing [0,0,0]
         poll.encrypted_tally = [[0u8; 32]; 3]; 
         poll.is_active = true;
         Ok(())
     }
 
-    /// [升级] 投递加密选票
-    /// 用户在本地加密 Choice 和 Weight，发送给 Arcium 进行累加
+    /// [Upgrade] Submit an encrypted vote
+    /// Users encrypt Choice and Weight locally and send them to Arcium for aggregation
     pub fn cast_vote(
         ctx: Context<CastVote>,
         computation_offset: u64,
-        encrypted_choice: [u8; 32], // 用户加密的选择 (1, 2, 3)
-        encrypted_weight: [u8; 32], // 用户加密的权重 (Token Balance)
+        encrypted_choice: [u8; 32], // User-encrypted choice (1, 2, 3)
+        encrypted_weight: [u8; 32], // User-encrypted weight (Token Balance)
         pubkey: [u8; 32],
         nonce: u128,
     ) -> Result<()> {
@@ -45,12 +45,12 @@ pub mod private_voting {
             .x25519_pubkey(pubkey)
             .plaintext_u128(nonce);
 
-        // 1. 注入当前链上加密状态 (Current Tally)
+        // 1. Inject the current on-chain encrypted state (Current Tally)
         for count in &poll.encrypted_tally {
             builder = builder.encrypted_u64(*count);
         }
 
-        // 2. 注入用户新选票 (User Vote)
+        // 2. Inject the user's new vote (User Vote)
         builder = builder
             .encrypted_u64(encrypted_choice)
             .encrypted_u64(encrypted_weight);
@@ -80,10 +80,10 @@ pub mod private_voting {
             Err(_) => return Err(ErrorCode::AbortedComputation.into()),
         };
 
-        // 更新链上状态为新的密文总数
+        // Update the on-chain state to the new ciphertext totals
         let poll = &mut ctx.accounts.poll;
         
-        // Arcis 返回: new_counts [u64; 3]
+        // Arcis returns: new_counts [u64; 3]
         poll.encrypted_tally[0] = o.ciphertexts[0]; // New Yes
         poll.encrypted_tally[1] = o.ciphertexts[1]; // New No
         poll.encrypted_tally[2] = o.ciphertexts[2]; // New Abstain
@@ -97,9 +97,9 @@ pub mod private_voting {
         Ok(())
     }
 
-    /// [新增] 关闭投票并公示结果 (需配合解密逻辑)
-    /// 在 Arcium 中，解密通常需要额外的私钥操作或特定的 Reveal 电路
-    /// 这里简化为标记状态
+    /// [New] Close the poll and publish results (requires decryption logic)
+    /// In Arcium, decryption usually requires additional private key operations or specific Reveal circuits
+    /// Here, it is simplified to marking the state
     pub fn close_poll(ctx: Context<ClosePoll>) -> Result<()> {
         let poll = &mut ctx.accounts.poll;
         poll.is_active = false;
@@ -129,7 +129,7 @@ pub struct CreatePoll<'info> {
 pub struct PollAccount {
     pub authority: Pubkey,
     pub proposal_id: u64,
-    // 存储 [Yes, No, Abstain] 的加密计数值
+    // Stores encrypted counts for [Yes, No, Abstain]
     pub encrypted_tally: [[u8; 32]; 3],
     pub is_active: bool,
 }
@@ -141,7 +141,7 @@ pub struct CastVote<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     #[account(mut)]
-    pub poll: Account<'info, PollAccount>, // 读取并更新
+    pub poll: Account<'info, PollAccount>, // Read and update
     
     #[account(init_if_needed, space = 9, payer = payer, seeds = [&SIGN_PDA_SEED], bump, address = derive_sign_pda!())]
     pub sign_pda_account: Account<'info, ArciumSignerAccount>,
